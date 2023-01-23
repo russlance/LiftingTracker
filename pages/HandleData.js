@@ -36,7 +36,10 @@ export const setItem = async (id, routineName, newWorkout) => {
         newWorkout = { id: workoutID, wName: "Sample Workout", sets: null };
       } else {
         let tempItem = await getRoutine(id);
-        newArray = tempItem.workouts;
+        tempItem.workouts.map((i) => {
+          if (i.id != newWorkout.id) newArray.push(i);
+        });
+        // newArray = tempItem.workouts;
         routineID = id;
       }
 
@@ -51,6 +54,7 @@ export const setItem = async (id, routineName, newWorkout) => {
       let _tempArray = JSON.stringify(newItem);
       let idString = routineID.toString();
       await AsyncStorage.setItem(idString, _tempArray);
+      return true;
     } catch (e) {
       console.error("AsyncStorage#setItem error: " + e.message);
     }

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, Alert, BackHandler } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import {
   Provider as PaperProvider,
   IconButton,
@@ -9,25 +9,25 @@ import {
   DataTable,
   TextInput,
 } from "react-native-paper";
-import { Calendar, CalendarList } from "react-native-calendars";
+import { Calendar } from "react-native-calendars";
 import * as dateFns from "date-fns";
 import { getRoutine, setItem } from "./HandleData";
 
-export default function Workout({ route, navigation }) {
+export default function Workout({ route }) {
   const { routineID, workout } = route.params;
   const [displayDate, setDisplayDate] = React.useState();
   const [showCalendar, setCalendarModel] = React.useState(false);
   const [showSetModal, setSetModal] = React.useState(false);
+  const [showEditModal, setEditModal] = React.useState(false);
   const [editItem, setEditItem] = React.useState([]);
+  const [newWord, setNewWord] = React.useState();
   const [weight, setWeight] = React.useState(null);
   const [reps, setReps] = React.useState(null);
-  const [counter, setCounter] = React.useState(1);
   const [sets, setSets] = React.useState([]);
 
   React.useEffect(() => {
     console.log("Workout Page");
     updateDate(null);
-    console.log(displayDate);
     displayInfo();
   }, []);
 
@@ -35,8 +35,11 @@ export default function Workout({ route, navigation }) {
     if (workout.sets === null) {
       console.log("empty");
       setSets([]);
-      // } else handleDate();
-    } else setSets(workout.sets);
+    } else {
+      console.log("sets");
+      console.log(workout.sets);
+      setSets(workout.sets);
+    }
   };
 
   //  populates table with sets based on display date
@@ -63,32 +66,43 @@ export default function Workout({ route, navigation }) {
         weight: weight,
         reps: reps,
       };
-      let tempFullList = sets;
+      console.log(sets);
+      let tempFullList;
+      sets.map((item) => tempFullList.push(item));
+      // let tempFullList = sets;
       tempFullList.push(tempSet);
       setSets(tempFullList);
-      console.log(sets);
       workout.sets = sets;
 
-      //  get the routine this workout is part of
-      //  get the workouts from that routine
-      //  update the sets for this workout
-      let routine = await getRoutine(routineID);
-      let routineWorkouts = routine.workouts;
-      routineWorkouts.map((rw) => {
-        if (rw.id === workout.id) rw = JSON.stringify(workout);
-      });
-
-      //  save the routine again, with the updated workout
-      setItem(JSON.stringify(routine.id), routine.rName, routineWorkouts);
+      saveWorkout();
       setWeight(null);
       setReps(null);
     }
   };
 
-  const editName = async (newName) => {
-    workout.wName = newName;
+  const editName = async () => {
+    workout.wName = newWord;
+    await saveWorkout();
+    setNewWord(null);
+    setEditModal(false);
+  };
+
+  const saveWorkout = async () => {
+    //  get the routine this workout is part of
+    //  get the workouts from that routine
+    //  update the sets for this workout
     let routine = await getRoutine(routineID);
-    setItem(JSON.stringify(routine.id), routine.rName, routineWorkouts);
+    let routineWorkouts = routine.workouts;
+    routineWorkouts.map(async (rw) => {
+      if (rw.id === workout.id) {
+        rw = workout;
+        //  save the routine again, with the updated workout
+        await setItem(JSON.stringify(routine.id), routine.rName, rw);
+        return;
+      }
+    });
+
+    return true;
   };
 
   const removeSet = (index) => {
@@ -143,15 +157,14 @@ export default function Workout({ route, navigation }) {
         justifyContent: "flex-start",
       }}
     >
-      {/* save button, calendar button, displayed date */}
+      {/* displayed date */}
       <View
         style={{
           flexDirection: "row",
-          alignItems: "center",
+          alignContent: "center",
           justifyContent: "space-between",
         }}
       >
-        {/* <IconButton icon="content-save-outline" /> */}
         <Text
           style={{
             paddingLeft: 2,
@@ -184,7 +197,7 @@ export default function Workout({ route, navigation }) {
         >
           {workout.wName}
         </Text>
-        <IconButton icon="pencil-outline" />
+        <IconButton icon="pencil-outline" onPress={() => setEditModal(true)} />
       </View>
       <Divider />
 
@@ -252,6 +265,31 @@ export default function Workout({ route, navigation }) {
       </View>
 
       <Portal>
+        {/* edit workout name modal */}
+        <Modal
+          style={styles.container}
+          visible={showEditModal}
+          onDismiss={() => setEditModal(false)}
+        >
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-around",
+            }}
+          >
+            <TextInput
+              style={{ flex: 0.8, textAlign: "center" }}
+              placeholder="New Workout Name"
+              onChangeText={(newName) => setNewWord(newName)}
+              mode="outlined"
+            />
+            <IconButton
+              icon="content-save-outline"
+              onPress={() => editName()}
+            />
+          </View>
+        </Modal>
+
         {/* calendar modal */}
         <Modal
           style={styles.container}

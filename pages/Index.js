@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { View, Text, Alert } from "react-native";
 import {
   Provider as PaperProvider,
@@ -29,16 +30,21 @@ export default function HomeScreen({ navigation }) {
   const [all, setAll] = React.useState([]);
 
   React.useEffect(() => {
-    console.log("***** start *****");
     // AsyncStorage.clear();
-    showAllWorkouts();
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      showAllWorkouts();
+      console.log("refocusing");
+    }, [])
+  );
+
   const addRoutine = async (id, routineName, newWorkout) => {
-    setItem(id, routineName, newWorkout);
+    await setItem(id, routineName, newWorkout);
+    showAllWorkouts();
     setRoutineName("");
     setWorkoutName("");
-    showAllWorkouts();
   };
 
   //  this needs to be reworked to remove item from array
@@ -65,11 +71,8 @@ export default function HomeScreen({ navigation }) {
   };
 
   const showAllWorkouts = async () => {
-    let tempArray = await getAllData();
-    if (tempArray != null) setAll(await getAllData());
-    else setAll([]);
-    console.log("Home Page");
-    // console.log(all);
+    setAll(await getAllData());
+    console.log(all);
   };
 
   return (

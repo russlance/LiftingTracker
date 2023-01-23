@@ -1,10 +1,9 @@
 import "react-native-gesture-handler";
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
 import { Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import HomeScreen from "./pages/Home";
+import HomeScreen from "./pages/Index";
 import Workout from "./pages/Workout";
 import theme from "./Theme";
 
