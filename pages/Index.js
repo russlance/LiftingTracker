@@ -27,7 +27,7 @@ import {
 export default function HomeScreen({ navigation }) {
   const [routineName, setRoutineName] = React.useState("");
   const [workoutName, setWorkoutName] = React.useState("");
-  const [all, setAll] = React.useState([]);
+  const [all, setAll] = React.useState(null);
 
   React.useEffect(() => {
     // AsyncStorage.clear();
@@ -36,7 +36,6 @@ export default function HomeScreen({ navigation }) {
   useFocusEffect(
     React.useCallback(() => {
       showAllWorkouts();
-      console.log("refocusing");
     }, [])
   );
 

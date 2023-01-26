@@ -26,35 +26,31 @@ export default function Workout({ route }) {
   const [sets, setSets] = React.useState([]);
 
   React.useEffect(() => {
-    console.log("Workout Page");
     updateDate(null);
     displayInfo();
   }, []);
 
   const displayInfo = () => {
     if (workout.sets === null) {
-      console.log("empty");
       setSets([]);
     } else {
-      console.log("sets");
-      console.log(workout.sets);
       setSets(workout.sets);
     }
   };
 
   //  populates table with sets based on display date
-  const handleDate = () => {
-    let flag = 0;
-    workout.sets.map((set) => {
-      console.log("set date: " + set.date);
-      console.log("display date: " + displayDate);
-      if (set.date === displayDate) {
-        setSets(set);
-        flag = 1;
-      }
-    });
-    if (flag === 0) setSets([]);
-  };
+  // const handleDate = () => {
+  //   let flag = 0;
+  //   workout.sets.map((set) => {
+  //     console.log("set date: " + set.date);
+  //     console.log("display date: " + displayDate);
+  //     if (set.date === displayDate) {
+  //       setSets(set);
+  //       flag = 1;
+  //     }
+  //   });
+  //   if (flag === 0) setSets([]);
+  // };
 
   const addSet = async () => {
     if (weight === null || reps === null)
@@ -66,15 +62,13 @@ export default function Workout({ route }) {
         weight: weight,
         reps: reps,
       };
-      console.log(sets);
-      let tempFullList;
+      let tempFullList = [];
       sets.map((item) => tempFullList.push(item));
-      // let tempFullList = sets;
       tempFullList.push(tempSet);
       setSets(tempFullList);
-      workout.sets = sets;
-
-      saveWorkout();
+      workout.sets = tempFullList;
+      console.log(workout.sets);
+      await saveWorkout();
       setWeight(null);
       setReps(null);
     }
@@ -92,27 +86,14 @@ export default function Workout({ route }) {
     //  get the workouts from that routine
     //  update the sets for this workout
     let routine = await getRoutine(routineID);
-    let routineWorkouts = routine.workouts;
-    routineWorkouts.map(async (rw) => {
-      if (rw.id === workout.id) {
-        rw = workout;
-        //  save the routine again, with the updated workout
-        await setItem(JSON.stringify(routine.id), routine.rName, rw);
-        return;
-      }
-    });
-
+    setItem(JSON.stringify(routine.id), routine.rName, workout);
     return true;
   };
 
   const removeSet = (index) => {
-    // let tempFullList = this.state.sets;
     let tempFullList = sets;
     tempFullList.splice(index - 1, 1);
     setSets(tempFullList);
-    // this.setState({
-    //   allSets: tempFullList,
-    // });
   };
 
   const selectItemToEdit = (display, item) => {
@@ -126,7 +107,6 @@ export default function Workout({ route }) {
   };
 
   const updateSet = (item, newWeight, newReps) => {
-    // let tempArray = this.state.sets;
     let tempArray = sets;
     let tempItem = tempArray[item[0] - 1];
     tempItem[1] = newWeight;
@@ -134,10 +114,6 @@ export default function Workout({ route }) {
     tempArray[item[0] - 1] = tempItem;
     setSets(tempArray);
     setSetModal(false);
-    // this.setState({
-    //   allSets: tempArray,
-    // });
-    // this.showSetEditModal(false);
   };
 
   const updateDate = (newDate) => {
@@ -174,10 +150,6 @@ export default function Workout({ route }) {
         >
           {displayDate}
         </Text>
-        {/* <IconButton
-          icon="calendar-range-outline"
-          onPress={() => setCalendarModel(true)}
-        /> */}
       </View>
       <Divider />
 
@@ -218,7 +190,6 @@ export default function Workout({ route }) {
           mode="outlined"
           placeholder="Weight"
           value={weight}
-          // label={weight}
           onChangeText={(newWeight) => setWeight(newWeight)}
           keyboardType="number-pad"
         />
@@ -227,7 +198,6 @@ export default function Workout({ route }) {
           mode="outlined"
           placeholder="Reps"
           value={reps}
-          // label={reps}
           onChangeText={(newReps) => setReps(newReps)}
           keyboardType="number-pad"
         />
