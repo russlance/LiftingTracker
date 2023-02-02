@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "liftingTracker",
-    "slug": "liftingTracker",
+    "slug": "lifting-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,10 +24,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.rlance.liftingtracker"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ce2c263a-698f-43be-bc2a-e348bdbfc1db"
+      }
+    },
+    "owner": "rlance"
   }
 }
